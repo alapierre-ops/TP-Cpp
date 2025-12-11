@@ -35,7 +35,10 @@ function(compile_options TARGET_NAME )
                 -Wno-nullability-completeness
                 -Werror
         )
-        target_link_libraries(${TARGET_NAME} -static)
+        # Ne pas utiliser -static sur macOS car ce n'est pas supporté
+        if(NOT APPLE)
+            target_link_libraries(${TARGET_NAME} -static)
+        endif()
         if (CMAKE_BUILD_TYPE STREQUAL "Debug")
             target_compile_options(${TARGET_NAME} PRIVATE
                     -O0

@@ -6,7 +6,32 @@ if(MSVC)
     set(STD_BASE_DIR ${COMPILER_DIR}/../../../modules)
     set(STD_EXTENSION ixx)
 else()
+    # Try to find std.cppm in common locations
     set(STD_BASE_DIR ${COMPILER_DIR}/../share/libc++/v1)
+    get_filename_component(STD_BASE_DIR "${STD_BASE_DIR}" ABSOLUTE)
+    
+    # Check if std.cppm exists at the calculated path
+    if(NOT EXISTS "${STD_BASE_DIR}/std.cppm")
+        # Try alternative paths for Homebrew on macOS
+        if(APPLE)
+            # Try /opt/homebrew/opt/llvm/share/libc++/v1
+            if(EXISTS "/opt/homebrew/opt/llvm/share/libc++/v1/std.cppm")
+                set(STD_BASE_DIR "/opt/homebrew/opt/llvm/share/libc++/v1")
+            # Try to find in Cellar (version-specific path)
+            else()
+                file(GLOB LLVM_CELLAR_DIRS "/opt/homebrew/Cellar/llvm/*/share/libc++/v1")
+                if(LLVM_CELLAR_DIRS)
+                    list(GET LLVM_CELLAR_DIRS 0 STD_BASE_DIR)
+                endif()
+            endif()
+        endif()
+    endif()
+    
+    # Verify the file exists
+    if(NOT EXISTS "${STD_BASE_DIR}/std.cppm")
+        message(FATAL_ERROR "Cannot find std.cppm. Searched in: ${STD_BASE_DIR}")
+    endif()
+    
     set(STD_EXTENSION cppm)
 endif()
 

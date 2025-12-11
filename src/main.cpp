@@ -1,7 +1,6 @@
-import exo1;
+import pvz.game;
 
 int main() {
-    // Exécution de l'application via son constructeur
-    exo1::Application{};
+    pvz::Application{};
     return 0;
 }
